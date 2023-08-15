@@ -19,6 +19,7 @@ public class App {
             System.out.println("Escolha uma opção:");
             System.out.println("1 - Inserir pessoa");
             System.out.println("2 - Excluir pessoa");
+            System.out.println("3 - Alterar informações da pessoa");
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -71,6 +72,48 @@ public class App {
                 }
 
                 deleteStatement.close();
+
+            } else if (choice == 3) {
+                String selectQuery = "SELECT id, nome, idade, sexo FROM pessoas";
+                PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+                ResultSet resultSet = selectStatement.executeQuery();
+
+                System.out.println("Lista de pessoas cadastradas:");
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("id");
+                    String nome = resultSet.getString("nome");
+                    int idade = resultSet.getInt("idade");
+                    String sexo = resultSet.getString("sexo");
+                    System.out.println("ID: " + id + ", Nome: " + nome + ", Idade: " + idade + ", Sexo: " + sexo);
+                }
+
+                System.out.print("Digite o ID da pessoa que deseja alterar: ");
+                int idToUpdate = scanner.nextInt();
+                scanner.nextLine();
+
+                System.out.print("Digite o novo nome da pessoa: ");
+                String newNome = scanner.nextLine();
+
+                System.out.print("Digite a nova idade da pessoa: ");
+                int newIdade = scanner.nextInt();
+                scanner.nextLine();
+
+                System.out.print("Digite o novo sexo da pessoa: ");
+                String newSexo = scanner.nextLine();
+
+                String updateQuery = "UPDATE pessoas SET nome = ?, idade = ?, sexo = ? WHERE id = ?";
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                updateStatement.setString(1, newNome);
+                updateStatement.setInt(2, newIdade);
+                updateStatement.setString(3, newSexo);
+                updateStatement.setInt(4, idToUpdate);
+
+                int rowsUpdated = updateStatement.executeUpdate();
+                if (rowsUpdated > 0) {
+                    System.out.println("Informações da pessoa atualizadas com sucesso!");
+                }
+
+                updateStatement.close();
             }
 
             connection.close();
